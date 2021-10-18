@@ -1,7 +1,7 @@
 # This is a basic workflow to help you get started with Actions
 name: CD Internal-Lane
 # Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch..
+# events but only for the master branch.
 on:
   push:
     tags:
@@ -22,7 +22,7 @@ jobs:
           flutter-version: "2.5.0"
 
       - name: Decode android/neumodore_key.jks
-        run: echo "${{ secrets.KEYSTORE_JKS_PROD }}" | base64 --decode > android/keystore.jks
+        run: echo "${{ secrets.KEYSTORE_JKS_PROD }}" | base64 --decode > android/key.jks
 
       - name: Decode android/key.properties
         run: echo "${{ secrets.KEY_PROPERTIES_PROD }}" | base64 --decode > android/key.properties
