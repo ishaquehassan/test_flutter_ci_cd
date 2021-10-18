@@ -72,5 +72,5 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
           packageName: com.flutter.cicd.test
           releaseFiles: app-release.aab
-          track: Production
+          track: production
           whatsNewDirectory: distribution/whatsnew
