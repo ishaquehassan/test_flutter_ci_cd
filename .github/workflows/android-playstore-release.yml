@@ -9,7 +9,8 @@ jobs:
     name: Create version number
     runs-on: ubuntu-latest
     steps:
-      - run: echo "NOW=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
+      - name: Patch ENV
+        run: echo "NOW=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Fetch all history for all tags and branches
         run: |
