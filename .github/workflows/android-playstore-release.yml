@@ -74,3 +74,4 @@ jobs:
           releaseFiles: app-release.aab
           track: production
           whatsNewDirectory: distribution/whatsnew
+          status: draft
