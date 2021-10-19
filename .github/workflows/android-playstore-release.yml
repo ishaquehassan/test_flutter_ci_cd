@@ -4,8 +4,6 @@ name: CD Production-Fast-Lane
 # events but only for the master branch.
 on:
   push:
-    #tags:
-     # - "internal-v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
     branches:
       - master
 jobs:
@@ -36,7 +34,7 @@ jobs:
       - name: Build APPBUNDLE
         run: flutter build appbundle --release && flutter build apk --release
 
-      - name: Read pubspec.yaml Data
+      - name: Read pubspec.yaml Version
         uses: KJ002/read-yaml@1.5
         id: pubspec-data
         with:
@@ -49,7 +47,6 @@ jobs:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
           tag: "Release-${{ steps.pubspec-data.outputs.data }}"
-          #tag: ${{ github.event.head_commit.message }}
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
@@ -66,7 +63,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: APPBUNDLE
-      - name: Release APPBUNDLE to internal track
+      - name: Release APPBUNDLE to Production track
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
