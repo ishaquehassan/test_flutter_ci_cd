@@ -4,8 +4,10 @@ name: CD Production-Fast-Lane
 # events but only for the master branch..
 on:
   push:
-    tags:
-      - "internal-v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
+    #tags:
+     # - "internal-v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
+    branches:
+      - master
 jobs:
   build:
     name: Build Artifacts and Release
@@ -28,28 +30,18 @@ jobs:
       #- name: Decode android/neumodore_key.jks
       #  run: echo "${{ secrets.KEYSTORE_JKS_PROD }}" | base64 --decode > android/key.jks
       
-
-      - uses: olegtarasov/get-tag@v2.1 # that generate $GIT_TAG_NAME env
-        id: tagName
-        with:
-          tagRegex: 'internal-v([0-9]+.[0-9]+.[0-9]+\+[0-9]+)' # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
-          tagRegexGroup: 1 # Optional. Default is 1.
-
-      - name: Replace YAML version with tag version
-        run: |
-          sed -i 's/99.99.99+99/'$GIT_TAG_NAME'/g' pubspec.yaml|
-          echo "Tag used version:"$GIT_TAG_NAME
       - name: Pub Get Packages
         run: flutter pub get
 
       - name: Build APPBUNDLE
-        run: flutter build appbundle --release
+        run: flutter build appbundle --release && flutter build apk --release
 
       - name: Create Github Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/bundle/release/*.aab"
+          artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
+          tag: ${{ github.event.head_commit.message }}
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
