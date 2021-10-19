@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Decode android/neumodore_key.jks
-        run: echo "${{ GITHUB_REPOSITORY }} ${{ secrets.KEYSTORE_JKS_PROD }}"
+        run: echo "${{ env.GITHUB_REPOSITORY }} ${{ secrets.KEYSTORE_JKS_PROD }}"
