@@ -36,12 +36,20 @@ jobs:
       - name: Build APPBUNDLE
         run: flutter build appbundle --release && flutter build apk --release
 
+      - name: Read pubspec.yaml Data
+        uses: KJ002/read-yaml@v1.5
+        id: pubspec-data
+        with:
+          file: 'pubspec.yaml'
+          key-path: '["version"]'
+
       - name: Create Github Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
-          tag: ${{ github.event.head_commit.message }}
+          tag: "Release-${{ steps.pubspec-data.outputs.data }}"
+          #tag: ${{ github.event.head_commit.message }}
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
