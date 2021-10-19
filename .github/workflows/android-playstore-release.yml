@@ -37,7 +37,7 @@ jobs:
         run: flutter build appbundle --release && flutter build apk --release
 
       - name: Read pubspec.yaml Data
-        uses: KJ002/read-yaml@v1.5
+        uses: KJ002/read-yaml@1.5
         id: pubspec-data
         with:
           file: 'pubspec.yaml'
