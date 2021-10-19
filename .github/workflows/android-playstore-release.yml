@@ -4,7 +4,7 @@ name: CD Production-Lane
 on:
   push:
     branches:
-      - master
+      - masters
 jobs:
   build:
     name: Build Artifacts and Release
