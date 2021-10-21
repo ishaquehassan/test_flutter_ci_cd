@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: generate unique value based on timestamp
+        run: echo BUILD_ID=foobar--$(date +%s) >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -45,7 +47,7 @@ jobs:
         with:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
-          tag: "Release-${{ steps.pubspec-data.outputs.data }}"
+          tag: "Release-${{ steps.pubspec-data.outputs.data }}-${{ env.BUILD_ID }}"
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
