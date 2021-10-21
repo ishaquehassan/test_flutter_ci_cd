@@ -11,8 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: generate unique value based on timestamp
-        run: echo BUILD_ID=foobar--$(date +%s) >> $GITHUB_ENV
+      - name: Read pubspec.yaml Version
+        uses: KJ002/read-yaml@1.5
+        id: pubspec-data
+        with:
+          file: 'pubspec.yaml'
+          key-path: '["version"]'
+      - name: Generate unique Release Tag
+        run: echo RELEASE_TAG=Release-${{ steps.pubspec-data.outputs.data }}-$(date +%s) >> $GITHUB_ENV
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -35,19 +41,12 @@ jobs:
       - name: Build APPBUNDLE
         run: flutter build appbundle --release && flutter build apk --release
 
-      - name: Read pubspec.yaml Version
-        uses: KJ002/read-yaml@1.5
-        id: pubspec-data
-        with:
-          file: 'pubspec.yaml'
-          key-path: '["version"]'
-
       - name: Create Github Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
-          tag: "Release-${{ steps.pubspec-data.outputs.data }}-${{ env.BUILD_ID }}"
+          tag: "${{env.RELEASE_TAG}}"
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
@@ -67,7 +66,7 @@ jobs:
           # Optional (recommended) mail server password:
           password: ${{secrets.MAIL_PASSWORD}}
           # Required mail subject:
-          subject: "New Build is here for ${{github.repository}} - Release-${{ steps.pubspec-data.outputs.data }}"
+          subject: "New Build is here for ${{github.repository}} - ${{env.RELEASE_TAG}}"
           # Required recipients' addresses:
           to: ${{secrets.MAIL_TO}}
           # Required sender full name (address can be skipped):
@@ -75,28 +74,28 @@ jobs:
           # Optional whether this connection use TLS (default is true if server_port is 465)
           secure: true
           # Optional plain body:
-          body: "Build job of ${{github.repository}} completed successfully! Download the APK for Release-${{ steps.pubspec-data.outputs.data }} \nhttps://github.com/${{github.repository}}/releases/download/Release-${{ steps.pubspec-data.outputs.data }}/app-release.apk"
+          body: "Build job of ${{github.repository}} completed successfully! Download the APK for ${{env.RELEASE_TAG}} \nhttps://github.com/${{github.repository}}/releases/download/${{env.RELEASE_TAG}}/app-release.apk"
           # Optional unsigned/invalid certificates allowance:
           ignore_cert: true
           #attachments: build/app/outputs/flutter-apk/app-release.apk
           priority: high
 
-  release_internal:
-    name: Release Artifacts to internal track
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Get APPBUNDLE from Artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: APPBUNDLE
-      - name: Release APPBUNDLE to Production track
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
-          packageName: com.flutter.cicd.test
-          releaseFiles: app-release.aab
-          track: production
-          whatsNewDirectory: distribution/whatsnew
-          status: draft
+  # release_internal:
+  #   name: Release Artifacts to internal track
+  #   needs: [build]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: Get APPBUNDLE from Artifacts
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: APPBUNDLE
+  #     - name: Release APPBUNDLE to Production track
+  #       uses: r0adkll/upload-google-play@v1
+  #       with:
+  #         serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
+  #         packageName: com.flutter.cicd.test
+  #         releaseFiles: app-release.aab
+  #         track: production
+  #         whatsNewDirectory: distribution/whatsnew
+  #         status: draft
