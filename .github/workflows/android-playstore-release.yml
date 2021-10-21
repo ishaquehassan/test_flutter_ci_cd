@@ -47,6 +47,7 @@ jobs:
           artifacts: "build/app/outputs/bundle/release/*.aab,build/app/outputs/flutter-apk/app-release.apk"
           token: ${{ secrets.GH_TOKEN }}
           tag: "${{env.RELEASE_TAG}}"
+          body: "${{ github.event.head_commit.message }}"
 
       - name: Save APPBUNDLE to Artifacts
         uses: actions/upload-artifact@v2
